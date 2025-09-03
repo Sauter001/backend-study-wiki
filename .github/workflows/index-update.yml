@@ -23,7 +23,7 @@ jobs:
 
       - name: Build docs/index.md
         run: |
-          python scripts/build_index.py
+          python scripts/build-index.py
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
