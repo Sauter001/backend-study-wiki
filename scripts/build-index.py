@@ -45,7 +45,7 @@ def rel_link(md_path: Path) -> str:
     예: docs/network/TCP.md -> network/TCP
     """
     rel = md_path.relative_to(DOCS_DIR)
-    rel.with_suffix("")
+    rel = rel.with_suffix("")
     return quote(str(rel))
 
 # ---------- 트리 빌드 ----------
