@@ -64,7 +64,7 @@
             .map((h) => {
               const d = data.find((x) => x.path === h.ref);
               const snip = escapeHtml(snippet(d.content, q));
-              const href = base + d.path; // baseurl + 경로
+              const href = base + d.path.replace(/\\/g, "/"); // baseurl + 경로
               return `<li><a href="${href}">${escapeHtml(
                 d.title
               )}</a><br><small>${snip}</small></li>`;
