@@ -93,13 +93,13 @@ def render_folder(node) -> list[str]:
     path: Path = node["path"]
     depth: int = node["depth"]
     name = normalize_name(path.name) if depth > 0 else "📚 스터디 내용 정리"
-
-    lines.append("{% include search.html %}")
     
     # 폴더 헤더
     lines.append(f"{header_for_depth(depth)} {name}")
     if depth == 0:
         lines.append("> 이 파일은 GitHub Actions로 자동 생성/갱신됩니다. 직접 수정하지 마세요.")
+        lines.append("{% include search.html %}")
+
     # 폴더 README 링크(있으면)
     if node["readme"] is not None:
         title = find_title(node["readme"])
