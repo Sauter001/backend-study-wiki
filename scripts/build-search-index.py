@@ -20,7 +20,7 @@ def title_of(path: Path, fallback=None) -> str:
 
 def rel_path_without_ext(path: Path) -> str:
     rel = path.relative_to(DOCS).with_suffix("")     # .md 제거
-    return "/" + quote(str(rel), safe='/')                     # /네트워크/TCP 형태
+    return "/" + quote(str(rel.as_posix()))                     # /네트워크/TCP 형태
 
 items = []
 for md in DOCS.rglob("*.md"):
