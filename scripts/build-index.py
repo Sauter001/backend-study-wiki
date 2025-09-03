@@ -92,8 +92,10 @@ def render_folder(node) -> list[str]:
     lines = []
     path: Path = node["path"]
     depth: int = node["depth"]
-    name = normalize_name(path.name) if depth > 0 else "스터디 내용 정리"
+    name = normalize_name(path.name) if depth > 0 else "📚 스터디 내용 정리"
 
+    lines.append("{% include search.html %}")
+    
     # 폴더 헤더
     lines.append(f"{header_for_depth(depth)} {name}")
     if depth == 0:

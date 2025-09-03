@@ -1,0 +1,82 @@
+<!-- 검색창 UI -->
+<input
+  id="q"
+  placeholder="검색어를 입력하세요"
+  style="width: 100%; padding: 8px; font-size: 16px; margin: 12px 0"
+/>
+<ul id="results"></ul>
+
+<!-- Lunr.js -->
+<script src="https://cdn.jsdelivr.net/npm/lunr/lunr.min.js"></script>
+<script>
+  (function () {
+    const base = "{{ site.baseurl }}"; // Jekyll이 baseurl 주입
+    const $q = document.getElementById("q");
+    const $out = document.getElementById("results");
+
+    function escapeHtml(s) {
+      return s.replace(
+        /[&<>"']/g,
+        (m) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[m])
+      );
+    }
+
+    function snippet(text, q, len = 120) {
+      const i = text.toLowerCase().indexOf(q.toLowerCase());
+      if (i < 0) return text.slice(0, len) + (text.length > len ? "…" : "");
+      const start = Math.max(0, i - Math.floor(len / 2));
+      const end = Math.min(text.length, start + len);
+      return (
+        (start > 0 ? "…" : "") +
+        text.slice(start, end) +
+        (end < text.length ? "…" : "")
+      );
+    }
+
+    fetch(base + "/search_index.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const idx = lunr(function () {
+          this.ref("path"); // 문서 식별자
+          this.field("title", { boost: 3 });
+          this.field("content");
+          data.forEach((d) => this.add(d));
+        });
+
+        function render(q) {
+          if (!q) {
+            $out.innerHTML = "";
+            return;
+          }
+          const hits = idx.search(lunr.utils.asString(q) + "*"); // 접두 일치
+          if (!hits.length) {
+            $out.innerHTML = "<li>검색 결과 없음</li>";
+            return;
+          }
+          $out.innerHTML = hits
+            .map((h) => {
+              const d = data.find((x) => x.path === h.ref);
+              const snip = escapeHtml(snippet(d.content, q));
+              const href = base + d.path; // baseurl + 경로
+              return `<li><a href="${href}">${escapeHtml(
+                d.title
+              )}</a><br><small>${snip}</small></li>`;
+            })
+            .join("");
+        }
+
+        let t = null;
+        $q.addEventListener("input", (e) => {
+          clearTimeout(t);
+          t = setTimeout(() => render(e.target.value.trim()), 120);
+        });
+      });
+  })();
+</script>
