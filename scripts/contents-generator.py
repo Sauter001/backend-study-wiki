@@ -62,7 +62,7 @@ class MarkdownTOCGenerator:
         toc_lines = [
             self.toc_start_marker,
             "",
-            "# 목차",
+            "## 목차",
             ""
         ]
         
@@ -74,7 +74,7 @@ class MarkdownTOCGenerator:
             toc_line = f"{indent}- [{title}](#{anchor})"
             toc_lines.append(toc_line)
         
-        toc_lines.extend(["", self.toc_end_marker, ""])
+        toc_lines.extend(["", "---", "", self.toc_end_marker, ""])
         
         return '\n'.join(toc_lines)
     
@@ -91,6 +91,41 @@ class MarkdownTOCGenerator:
         
         return content
     
+    def find_title_and_split_content(self, content: str) -> Tuple[str, str]:
+        """
+        문서 제목(첫 번째 # 헤더)을 찾고 제목과 나머지 내용을 분리합니다.
+        
+        Returns:
+            Tuple[str, str]: (제목 부분, 나머지 내용)
+        """
+        lines = content.split('\n')
+        title_end_idx = -1
+        
+        # 첫 번째 # 헤더 찾기
+        for i, line in enumerate(lines):
+            if re.match(r'^#\s+.+', line.strip()):
+                title_end_idx = i
+                break
+        
+        if title_end_idx == -1:
+            # 제목이 없으면 전체를 나머지 내용으로
+            return "", content
+        
+        # 제목 다음의 빈 줄들까지 포함해서 제목 섹션으로 처리
+        title_lines = [lines[title_end_idx]]
+        remaining_start_idx = title_end_idx + 1
+        
+        # 제목 다음의 연속된 빈 줄들을 제목 섹션에 포함
+        while (remaining_start_idx < len(lines) and 
+               lines[remaining_start_idx].strip() == ""):
+            title_lines.append(lines[remaining_start_idx])
+            remaining_start_idx += 1
+        
+        title_section = '\n'.join(title_lines)
+        remaining_content = '\n'.join(lines[remaining_start_idx:]) if remaining_start_idx < len(lines) else ""
+        
+        return title_section, remaining_content
+
     def process_file(self, file_path: str) -> bool:
         """
         마크다운 파일을 처리하여 목차를 생성/업데이트합니다.
@@ -106,8 +141,11 @@ class MarkdownTOCGenerator:
             # 기존 목차 제거
             content_without_toc = self.remove_existing_toc(content)
             
-            # 헤더 추출
-            headers = self.extract_headers(content_without_toc)
+            # 제목과 나머지 내용 분리
+            title_section, remaining_content = self.find_title_and_split_content(content_without_toc)
+            
+            # 헤더 추출 (나머지 내용에서만)
+            headers = self.extract_headers(remaining_content)
             
             if not headers:
                 print("⚠️  헤더를 찾을 수 없습니다. 목차를 생성하지 않습니다.")
@@ -116,11 +154,18 @@ class MarkdownTOCGenerator:
             # 목차 생성
             toc = self.generate_toc(headers)
             
-            # 새로운 내용 구성 (목차 + 기존 내용)
-            if content_without_toc.strip():
-                new_content = toc + '\n' + content_without_toc
-            else:
-                new_content = toc
+            # 새로운 내용 구성: 제목 + 목차 + 나머지 내용
+            new_content_parts = []
+            
+            if title_section.strip():
+                new_content_parts.append(title_section)
+            
+            new_content_parts.append(toc)
+            
+            if remaining_content.strip():
+                new_content_parts.append(remaining_content)
+            
+            new_content = '\n\n'.join(new_content_parts)
             
             # 파일 쓰기
             with open(file_path, 'w', encoding='utf-8') as f:

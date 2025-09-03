@@ -1,19 +1,22 @@
+# OSI 7 계층
+
+
 <!-- TOC START -->
 
-# 목차
+## 목차
 
-- [OSI 7 계층](#osi-7-계층)
-    - [1계층: 물리 계층 (Physical Layer)](#1계층-물리-계층-physical-layer)
-    - [2계층: 데이터 링크 계층 (Data Link Layer)](#2계층-데이터-링크-계층-data-link-layer)
-    - [3계층: 네트워크 계층 (Network Layer)](#3계층-네트워크-계층-network-layer)
-    - [4계층: 전송 계층 (Transport Layer)](#4계층-전송-계층-transport-layer)
-    - [5계층: 세션 계층 (Session Layer)](#5계층-세션-계층-session-layer)
-    - [6계층: 표현 계층 (Presentation Layer)](#6계층-표현-계층-presentation-layer)
-    - [7계층: 응용 계층 (Application Layer)](#7계층-응용-계층-application-layer)
+- [1계층: 물리 계층 (Physical Layer)](#1계층-물리-계층-physical-layer)
+- [2계층: 데이터 링크 계층 (Data Link Layer)](#2계층-데이터-링크-계층-data-link-layer)
+- [3계층: 네트워크 계층 (Network Layer)](#3계층-네트워크-계층-network-layer)
+- [4계층: 전송 계층 (Transport Layer)](#4계층-전송-계층-transport-layer)
+- [5계층: 세션 계층 (Session Layer)](#5계층-세션-계층-session-layer)
+- [6계층: 표현 계층 (Presentation Layer)](#6계층-표현-계층-presentation-layer)
+- [7계층: 응용 계층 (Application Layer)](#7계층-응용-계층-application-layer)
+
+---
 
 <!-- TOC END -->
 
-# OSI 7 계층
 
 ### 1계층: 물리 계층 (Physical Layer)
 
