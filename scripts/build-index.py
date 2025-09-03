@@ -2,6 +2,7 @@
 from pathlib import Path
 import re
 import unicodedata
+from urllib.parse import quote
 
 DOCS_DIR = Path("docs")
 INDEX_PATH = DOCS_DIR / "index.md"
@@ -44,7 +45,8 @@ def rel_link(md_path: Path) -> str:
     예: docs/network/TCP.md -> network/TCP
     """
     rel = md_path.relative_to(DOCS_DIR)
-    return str(rel.with_suffix(""))
+    rel.with_suffix("")
+    return quote(str(rel))
 
 # ---------- 트리 빌드 ----------
 
