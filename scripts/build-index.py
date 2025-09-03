@@ -53,7 +53,7 @@ def rel_link(md_path: Path) -> str:
 def list_children(dir_path: Path):
     items = []
     for p in sorted(dir_path.iterdir(), key=sort_key):
-        if is_hidden_or_tmp(p):
+        if is_hidden_or_tmp(p) or p.name.lower() == "images":
             continue
         # /docs 내부만, symlink는 무시(원한다면 허용 가능)
         if p.is_dir() or (p.is_file() and p.suffix.lower() == ".md"):
