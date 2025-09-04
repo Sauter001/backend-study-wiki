@@ -1,7 +1,5 @@
 # Ag grid, React 실습
 
-
-
 <!-- TOC START -->
 
 ## 목차
@@ -24,7 +22,6 @@
 ---
 
 <!-- TOC END -->
-
 
 # 스테이지 0: 프로젝트 베이스 깔기
 
@@ -52,12 +49,20 @@
 ```tsx
 import { useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
+import "./App.css";
+import {
+  ModuleRegistry,
+  AllCommunityModule,
+  themeQuartz,
+} from "ag-grid-community";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function App() {
   const [rowData] = useState([
-    { id: 1, name: "Aiko", age: 21, city: "Seoul" },
+    { id: 1, name: "Aiko", age: 21, salary: 2_500_000, city: "Seoul" },
     { id: 2, name: "Bora", age: 27, city: "Busan" },
-    { id: 3, name: "Choi", age: 19, city: "Daegu" },
+    { id: 3, name: "Choi", age: 19, salary: 4_000_000, city: "Daegu" },
   ]);
 
   const colDefs = useMemo(
@@ -80,12 +85,16 @@ export default function App() {
   );
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 480 }}>
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={colDefs}
-        defaultColDef={defaultColDef}
-      />
+    <div style={{ height: "100vh", width: "100%" }}>
+      <h1>AG Grid 테스트</h1>
+      <div style={{ height: 600, width: 600 }}>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+          theme={themeQuartz}
+        />
+      </div>
     </div>
   );
 }
@@ -133,6 +142,13 @@ const colDefs = [
 ```
 
 - `onCellValueChanged={(e)=>{ /* 저장 API 호출 등 */}}`로 서버 반영 훅.
+- `bg-red-50` 적용시 빨간색으로 바뀌게 하려면 **tailwind 설치**하거나 링크된 css에 속성 정의 해줘야 함
+
+```css
+.bg-red-50 {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+```
 
 ---
 
@@ -168,15 +184,18 @@ const colDefs = [
 ];
 
 <AgGridReact
-  rowSelection="multiple"
-  suppressRowClickSelection={true}
+  rowData={rowData}
   columnDefs={colDefs}
+  defaultColDef={defaultColDef}
+  theme={themeQuartz}
+  rowSelection={"multiple"}
 />;
 
 // 선택행 가져오기: gridApi.getSelectedRows()
 ```
 
 - 상단에 "선택 삭제/CSV" 버튼 두고 `gridApi`로 제어.
+- `suppressRowClickSelection`은 deprecated -> `rowSelection.enableClickSelection` 대신 사용
 
 ---
 
@@ -199,17 +218,38 @@ const colDefs = [
 - JSONPlaceholder로 가짜 데이터 받아보기.
 
 ```tsx
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
+import { AgGridReact } from "ag-grid-react";
+import {
+  ModuleRegistry,
+  AllCommunityModule,
+  themeQuartz,
+} from "ag-grid-community";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function App() {
   const gridRef = useRef(null);
   const [rowData, setRowData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const URL = "https://jsonplaceholder.typicode.com/users";
+
+  const colDefs = useMemo(
+    () => [
+      { field: "id", width: 90 },
+      { field: "name" },
+      { field: "email" },
+      { field: "city" },
+    ],
+    []
+  );
 
   useEffect(() => {
-    gridRef.current?.api.showLoadingOverlay();
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((r) => r.json())
-      .then((users) => {
+    // 그리드 마운트 전에도 OK
+    (async () => {
+      try {
+        const r = await fetch(URL);
+        const users = await r.json();
         setRowData(
           users.map((u) => ({
             id: u.id,
@@ -218,39 +258,50 @@ export default function App() {
             city: u.address.city,
           }))
         );
-        gridRef.current?.api.hideOverlay();
-      })
-      .catch(() => gridRef.current?.api.showNoRowsOverlay());
+      } finally {
+        setLoading(false); // 리액트 로딩 종료
+        // 그리드가 이미 준비됐으면 오버레이 끄기
+        gridRef.current?.api?.hideOverlay();
+      }
+    })();
   }, []);
 
-  const colDefs = [
-    { field: "id", width: 90 },
-    { field: "name" },
-    { field: "email", filter: "agTextColumnFilter" },
-    { field: "city", filter: "agSetColumnFilter" },
-  ];
+  const defaultColDef = useMemo(
+    () => ({
+      sortable: true,
+      filter: true,
+      resizable: true,
+    }),
+    []
+  );
 
   return (
-    <div>
+    <div style={{ height: "100vh", width: "100%" }}>
+      <h1>AG Grid 테스트</h1>
       <div className="mb-2 flex gap-2">
         <button onClick={() => gridRef.current?.api.refreshCells()}>
           새로고침
         </button>
       </div>
-      <div className="ag-theme-quartz" style={{ height: 480 }}>
+      <div style={{ height: 480 }}>
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
           columnDefs={colDefs}
-          defaultColDef={{ sortable: true, filter: true, resizable: true }}
+          defaultColDef={defaultColDef}
           overlayLoadingTemplate={
             '<span class="ag-overlay-loading-center">불러오는 중…</span>'
           }
           overlayNoRowsTemplate={
             '<span class="ag-overlay-loading-center">데이터 없음</span>'
           }
+          onGridReady={(p) => {
+            if (loading) p.api.loading = true; // 준비 시점에만 API 호출
+            else if (rowData.length === 0) p.api.showNoRowsOverlay();
+          }}
           pagination
-          paginationPageSize={10}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 50]}
         />
       </div>
     </div>
