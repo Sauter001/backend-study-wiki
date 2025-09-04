@@ -4,6 +4,7 @@
 
 ## lsj-note
 - [vite로 react 프로젝트 만드는 법](lsj-note/make-react-with-vite)
+- [Ag grid, React 실습](lsj-note/react-aggrid-ex)
 
 ## 네트워크
 - [OSI 7 계층](%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC/osi%207%EA%B3%84%EC%B8%B5)
