@@ -25,10 +25,20 @@ class MarkdownTOCGenerator:
         """
         headers = []
         lines = content.split('\n')
+        in_code_block = False
         
         for line in lines:
+            stripped = line.strip()
+
+            # code block 시작 끝 감지 (``` or ~~~)
+            if re.match(r'^(```|~~~)', stripped):
+                in_code_block = not in_code_block
+                continue
+            if in_code_block:
+                continue
+
             # ATX 스타일 헤더 매칭 (# ## ### 등)
-            match = re.match(r'^(#{1,6})\s+(.+?)(?:\s*#*\s*)?$', line.strip())
+            match = re.match(r'^(#{1,6})\s+(.+?)(?:\s*#*\s*)?$', stripped)
             if match:
                 level = len(match.group(1))  # # 개수
                 title = match.group(2).strip()

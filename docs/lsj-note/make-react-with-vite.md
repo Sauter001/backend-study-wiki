@@ -1,19 +1,21 @@
 # vite로 react 프로젝트 만드는 법
 
 
+
 <!-- TOC START -->
 
 ## 목차
 
-- [최신 버전 vite + react + typescript (추천)](#최신-버전-vite-react-typescript-추천)
-- [타입스크립트 싫으면 걍 react](#타입스크립트-싫으면-걍-react)
-  - [2. 설치 후 디렉토리 이동](#2-설치-후-디렉토리-이동)
-  - [개발 모드로 실행](#개발-모드로-실행)
+- [1. React 프로젝트 생성](#1-react-프로젝트-생성)
+- [2. 설치 후 디렉토리 이동](#2-설치-후-디렉토리-이동)
+- [3. 개발 모드로 실행](#3-개발-모드로-실행)
 
 ---
 
 <!-- TOC END -->
 
+
+## 1. React 프로젝트 생성
 
 ```bash
 # 최신 버전 vite + react + typescript (추천)
@@ -30,7 +32,7 @@ cd my-app
 npm install
 ```
 
-## 개발 모드로 실행
+## 3. 개발 모드로 실행
 
 ```bash
 npm run dev
